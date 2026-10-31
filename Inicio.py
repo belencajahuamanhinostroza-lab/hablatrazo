@@ -1,3 +1,4 @@
+
 import base64
 from io import BytesIO
 
@@ -13,58 +14,167 @@ from streamlit_drawable_canvas import st_canvas
 # ============================================================
 
 st.set_page_config(
-    page_title="HablaTrazo | Tablero de lenguaje",
+    page_title="HablaTrazo | Tablero inteligente",
     page_icon="🎨",
     layout="wide"
 )
 
 
 # ============================================================
-# ESTILOS
+# ESTILOS VISUALES: VERDE Y AZUL PASTEL
 # ============================================================
 
 st.markdown("""
 <style>
-    .main {
-        background-color: #F8FAFC;
-    }
 
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
+/* Fondo general */
+.stApp {
+    background: linear-gradient(
+        135deg,
+        #F0FAF6 0%,
+        #EDF7FA 48%,
+        #E8F3FA 100%
+    );
+}
 
-    .titulo {
-        color: #344767;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0;
-    }
+/* Contenedor */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+}
 
-    .subtitulo {
-        color: #718096;
-        font-size: 1.05rem;
-        margin-top: 5px;
-    }
+/* Título */
+.titulo {
+    background: linear-gradient(
+        90deg,
+        #55A88B,
+        #579BC5,
+        #7BAED0
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.8rem;
+    font-weight: 850;
+    margin-bottom: 0;
+}
 
-    .tarjeta {
-        background-color: #FFFFFF;
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid #E5E7EB;
-        margin-bottom: 15px;
-    }
+/* Subtítulo */
+.subtitulo {
+    color: #648B91;
+    font-size: 1.05rem;
+    margin-top: 5px;
+}
 
-    .pequeno {
-        color: #718096;
-        font-size: 0.9rem;
-    }
+/* Tarjetas */
+.tarjeta {
+    background: linear-gradient(
+        145deg,
+        #FFFFFF 0%,
+        #F0FAF7 55%,
+        #EEF7FC 100%
+    );
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid #DCEFE9;
+    box-shadow: 0 5px 18px rgba(91, 151, 143, 0.08);
+    margin-bottom: 16px;
+    color: #496D70;
+}
 
-    div.stButton > button {
-        border-radius: 10px;
-        font-weight: 600;
-        min-height: 42px;
-    }
+/* Títulos de tarjetas */
+.tarjeta h4 {
+    color: #4C927F;
+}
+
+/* Texto secundario */
+.pequeno {
+    color: #789A9D;
+    font-size: 0.9rem;
+}
+
+/* Botones */
+div.stButton > button {
+    background: linear-gradient(
+        100deg,
+        #78C5A6,
+        #72B6D0
+    );
+    color: white;
+    border: none;
+    border-radius: 13px;
+    font-weight: 650;
+    min-height: 45px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(94, 166, 157, 0.18);
+}
+
+/* Efecto hover */
+div.stButton > button:hover {
+    background: linear-gradient(
+        100deg,
+        #60B493,
+        #5A9FC0
+    );
+    color: white;
+    border: none;
+    transform: translateY(-2px);
+}
+
+/* Barra lateral */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(
+        180deg,
+        #E3F4EC 0%,
+        #E5F1F8 100%
+    );
+    border-right: 1px solid #D7EAE5;
+}
+
+/* Encabezados */
+h1, h2, h3 {
+    color: #477F7D;
+}
+
+/* Texto general */
+p, label {
+    color: #587B7D;
+}
+
+/* Selectores */
+div[data-baseweb="select"] > div {
+    background-color: #FFFFFF;
+    border-radius: 11px;
+    border-color: #D5EAE3;
+}
+
+/* Campos de texto */
+div[data-baseweb="input"] {
+    background-color: #FFFFFF;
+    border-radius: 11px;
+}
+
+/* Alertas */
+div[data-testid="stAlert"] {
+    background: linear-gradient(
+        100deg,
+        #E4F5EC,
+        #E5F2FA
+    );
+    border: 1px solid #CDE8DF;
+    border-radius: 14px;
+}
+
+/* Separadores */
+hr {
+    border-color: #D5EAE4;
+}
+
+/* Canvas */
+canvas {
+    border-radius: 15px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -78,9 +188,6 @@ if "analysis_done" not in st.session_state:
 
 if "full_response" not in st.session_state:
     st.session_state.full_response = ""
-
-if "drawing_base64" not in st.session_state:
-    st.session_state.drawing_base64 = ""
 
 if "drawing_bytes" not in st.session_state:
     st.session_state.drawing_bytes = None
@@ -100,70 +207,61 @@ def image_to_base64(image):
     """Convierte una imagen PIL a Base64."""
     buffer = BytesIO()
     image.save(buffer, format="PNG")
-    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-
-def create_client(api_key):
-    """Crea el cliente de OpenAI."""
-    return OpenAI(api_key=api_key)
+    return base64.b64encode(
+        buffer.getvalue()
+    ).decode("utf-8")
 
 
 def analyze_drawing(client, image_base64, age_group, objective):
-    """Analiza el dibujo y propone actividades de lenguaje."""
 
     prompt = f"""
     Eres un asistente educativo que apoya a terapeutas de lenguaje
     en actividades de estimulación del lenguaje infantil.
 
-    Vas a observar el dibujo realizado por un niño.
+    Observa el dibujo realizado por un niño.
 
-    INFORMACIÓN PARA ADAPTAR LA ACTIVIDAD:
+    INFORMACIÓN:
     - Grupo de edad aproximado: {age_group}
-    - Objetivo que desea trabajar el terapeuta: {objective}
+    - Objetivo terapéutico: {objective}
 
-    Analiza el dibujo y responde en español con un lenguaje claro,
-    amable y sencillo.
-
-    Organiza tu respuesta con estas secciones:
+    Responde en español, de forma clara, amable y organizada.
 
     ### 1. ¿Qué observamos en el dibujo?
-    Describe brevemente los elementos que parecen aparecer.
-    Si no estás seguro de qué representa algún elemento, indícalo
-    y ofrece posibles interpretaciones. No inventes detalles.
+    Describe los elementos que parecen aparecer.
+    Si no estás seguro, menciona las posibles interpretaciones.
 
     ### 2. Palabras para trabajar
     Propón entre 4 y 6 palabras relacionadas con el dibujo.
-    Incluye sustantivos, características o acciones cuando corresponda.
+    Incluye sustantivos, características y acciones cuando corresponda.
 
     ### 3. Preguntas para conversar
     Propón 4 preguntas abiertas y sencillas que el terapeuta
-    pueda hacerle al niño sobre su dibujo.
+    pueda hacerle al niño.
 
     ### 4. Actividad de lenguaje
-    Crea una actividad breve relacionada con el objetivo:
+    Crea una actividad breve relacionada con este objetivo:
     {objective}
 
-    Explica cómo realizarla en unos pocos pasos.
+    Explica cómo realizarla en pocos pasos.
 
-    ### 5. Ejemplo de frase
+    ### 5. Construcción de frases
     Propón 2 frases cortas que el niño podría construir
-    utilizando los elementos de su dibujo.
+    utilizando los elementos del dibujo.
 
     ### 6. Idea para continuar
-    Sugiere una pequeña pregunta o reto para que el niño
-    pueda ampliar su dibujo o seguir conversando.
+    Sugiere un pequeño reto o pregunta para ampliar el dibujo
+    y continuar la conversación.
 
-    IMPORTANTE:
-    - Adapta la complejidad al grupo de edad indicado.
-    - Mantén un tono positivo, cercano y respetuoso.
-    - No evalúes la inteligencia, el desarrollo ni las capacidades
-      del niño a partir de su dibujo.
-    - No realices diagnósticos ni afirmes que el niño tiene
-      dificultades de lenguaje.
-    - No confundas la interpretación del dibujo con una evaluación
-      de pronunciación o expresión oral.
-    - Estas sugerencias son orientativas y deben ser revisadas
-      por el terapeuta.
+    REGLAS IMPORTANTES:
+    - Adapta la complejidad al grupo de edad.
+    - Mantén un tono positivo y cercano.
+    - No inventes detalles que no puedas observar.
+    - No evalúes la inteligencia ni el desarrollo del niño.
+    - No realices diagnósticos.
+    - No afirmes que el niño tiene dificultades del lenguaje.
+    - No evalúes pronunciación o expresión oral a partir del dibujo.
+    - Las sugerencias deben ser revisadas por el terapeuta.
     """
 
     response = client.chat.completions.create(
@@ -192,22 +290,24 @@ def analyze_drawing(client, image_base64, age_group, objective):
 
 
 def create_story(client, description, age_group):
-    """Genera una historia breve basada en el dibujo."""
 
     prompt = f"""
-    Crea una historia infantil breve y creativa basada en esta
-    interpretación de un dibujo:
+    Crea una historia infantil breve y creativa basada
+    en la siguiente interpretación de un dibujo:
 
     {description}
 
-    La historia debe estar adaptada para niños de {age_group}.
-    Utiliza palabras sencillas, oraciones cortas y un tono divertido.
+    Edad aproximada: {age_group}.
 
-    Al final agrega:
+    La historia debe:
+    - Utilizar palabras sencillas.
+    - Tener oraciones cortas.
+    - Ser divertida y apropiada para niños.
+    - Mantener relación con el dibujo.
+
+    Al final incluye:
     - 3 preguntas sencillas sobre la historia.
-    - 3 palabras importantes que el niño pueda aprender o repetir.
-
-    No agregues elementos que contradigan la descripción del dibujo.
+    - 3 palabras importantes para aprender.
     """
 
     response = client.chat.completions.create(
@@ -242,13 +342,13 @@ st.markdown(
 st.write("")
 
 st.info(
-    "HablaTrazo convierte los dibujos de los niños en oportunidades "
-    "para conversar, aprender palabras y construir pequeñas historias."
+    "HablaTrazo transforma los dibujos infantiles en oportunidades "
+    "para conversar, aprender palabras y crear historias."
 )
 
 
 # ============================================================
-# PANEL LATERAL: CONFIGURACIÓN
+# PANEL LATERAL
 # ============================================================
 
 with st.sidebar:
@@ -283,8 +383,8 @@ with st.sidebar:
     )
 
     st.caption(
-        "La edad solo sirve para adaptar la dificultad de las "
-        "actividades. No representa una evaluación del niño."
+        "La edad permite adaptar las actividades. "
+        "No representa una evaluación del niño."
     )
 
     st.divider()
@@ -344,8 +444,8 @@ with st.sidebar:
     )
 
     st.caption(
-        "La clave se utiliza para realizar el análisis con el modelo "
-        "de inteligencia artificial."
+        "La clave se utiliza para realizar el análisis "
+        "con el modelo de inteligencia artificial."
     )
 
     st.divider()
@@ -353,8 +453,8 @@ with st.sidebar:
     st.markdown("### 💡 Acerca de HablaTrazo")
 
     st.write(
-        "Una herramienta de apoyo para que los terapeutas puedan "
-        "aprovechar los dibujos infantiles como punto de partida "
+        "Una herramienta de apoyo para que los terapeutas "
+        "aprovechen los dibujos infantiles como punto de partida "
         "para actividades de lenguaje."
     )
 
@@ -366,7 +466,7 @@ with st.sidebar:
 st.markdown("## 🖍️ ¡Vamos a dibujar!")
 
 st.write(
-    "Dibuja lo que quieras en el tablero. Puede ser un animal, "
+    "Dibuja lo que quieras en el tablero. Puedes crear un animal, "
     "una persona, un objeto, un lugar o una pequeña escena."
 )
 
@@ -388,11 +488,9 @@ with canvas_col:
 
 with info_col:
 
-    st.markdown("### 🌈 Tu espacio creativo")
-
     st.markdown("""
     <div class="tarjeta">
-        <h4>¿Qué puedes dibujar?</h4>
+        <h4>🌈 ¿Qué puedes dibujar?</h4>
         <p>🐶 Animales</p>
         <p>🏠 Lugares</p>
         <p>🍎 Alimentos</p>
@@ -404,7 +502,7 @@ with info_col:
 
     st.markdown("""
     <div class="tarjeta">
-        <h4>¿Cómo funciona?</h4>
+        <h4>💡 ¿Cómo funciona?</h4>
         <p>1. Realiza un dibujo.</p>
         <p>2. Presiona analizar.</p>
         <p>3. Descubre qué interpreta la IA.</p>
@@ -417,7 +515,7 @@ with info_col:
 # BOTONES DEL TABLERO
 # ============================================================
 
-button_col1, button_col2 = st.columns([1, 1])
+button_col1, button_col2 = st.columns(2)
 
 with button_col1:
 
@@ -435,12 +533,15 @@ with button_col2:
     )
 
 
+# ============================================================
+# LIMPIAR TABLERO
+# ============================================================
+
 if clear_button:
 
     st.session_state.canvas_key += 1
     st.session_state.analysis_done = False
     st.session_state.full_response = ""
-    st.session_state.drawing_base64 = ""
     st.session_state.drawing_bytes = None
     st.session_state.story = ""
 
@@ -448,7 +549,7 @@ if clear_button:
 
 
 # ============================================================
-# ANÁLISIS DEL DIBUJO
+# ANALIZAR DIBUJO
 # ============================================================
 
 if analyze_button:
@@ -456,19 +557,17 @@ if analyze_button:
     if not api_key:
 
         st.warning(
-            "Primero debes ingresar tu clave API de OpenAI "
-            "en el panel de configuración."
+            "Ingresa tu clave API de OpenAI en el panel lateral."
         )
 
     elif canvas_result.image_data is None:
 
-        st.warning("Primero realiza un dibujo en el tablero.")
+        st.warning("Primero realiza un dibujo.")
 
     else:
 
         try:
 
-            # Convertir el dibujo a una imagen
             input_array = np.array(
                 canvas_result.image_data
             ).astype("uint8")
@@ -477,7 +576,6 @@ if analyze_button:
                 input_array
             ).convert("RGB")
 
-            # Comprobar que el lienzo no esté vacío
             pixels = np.array(input_image)
 
             if not np.any(pixels < 245):
@@ -493,12 +591,10 @@ if analyze_button:
                     "🎨 HablaTrazo está observando tu dibujo..."
                 ):
 
-                    client = create_client(api_key)
+                    client = OpenAI(api_key=api_key)
 
-                    # Codificar imagen
                     image_base64 = image_to_base64(input_image)
 
-                    # Analizar dibujo
                     result = analyze_drawing(
                         client,
                         image_base64,
@@ -506,18 +602,15 @@ if analyze_button:
                         objective
                     )
 
-                    # Guardar resultados
                     buffer = BytesIO()
                     input_image.save(buffer, format="PNG")
 
                     st.session_state.drawing_bytes = buffer.getvalue()
-                    st.session_state.drawing_base64 = image_base64
                     st.session_state.full_response = result
                     st.session_state.analysis_done = True
                     st.session_state.story = ""
 
                 st.success("¡Tu dibujo ha sido analizado!")
-
 
         except Exception as e:
 
@@ -530,7 +623,7 @@ if analyze_button:
 
 
 # ============================================================
-# RESULTADOS DEL ANÁLISIS
+# RESULTADOS
 # ============================================================
 
 if st.session_state.analysis_done:
@@ -558,8 +651,9 @@ if st.session_state.analysis_done:
             st.session_state.full_response
         )
 
+
     # ========================================================
-    # HISTORIA INFANTIL
+    # CREAR HISTORIA
     # ========================================================
 
     st.divider()
@@ -567,20 +661,17 @@ if st.session_state.analysis_done:
     st.markdown("## 📚 ¡Convirtamos el dibujo en una historia!")
 
     st.write(
-        "A partir de lo que aparece en el dibujo, HablaTrazo "
-        "puede crear una pequeña historia para seguir conversando."
+        "HablaTrazo puede crear una pequeña historia a partir "
+        "de los elementos identificados en el dibujo."
     )
 
-    if st.button(
-        "✨ Crear una historia infantil",
-        use_container_width=False
-    ):
+    if st.button("✨ Crear una historia infantil"):
 
         try:
 
             with st.spinner("Inventando una historia..."):
 
-                client = create_client(api_key)
+                client = OpenAI(api_key=api_key)
 
                 story = create_story(
                     client,
@@ -622,7 +713,11 @@ st.divider()
 
 st.markdown(
     """
-    <p style="text-align:center; color:#718096; font-size:0.85rem;">
+    <p style="
+        text-align:center;
+        color:#789A9D;
+        font-size:0.85rem;
+    ">
         HablaTrazo · Dibuja, descubre y conversa 🎨
         <br>
         Herramienta de apoyo. Las sugerencias deben ser revisadas
