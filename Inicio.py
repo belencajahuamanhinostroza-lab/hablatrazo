@@ -10,182 +10,331 @@ from streamlit_drawable_canvas import st_canvas
 
 
 # ============================================================
-# CONFIGURACIÓN GENERAL
+# CONFIGURACIÓN
 # ============================================================
 
 st.set_page_config(
-    page_title="HablaTrazo | Tablero inteligente",
+    page_title="HablaTrazo",
     page_icon="🎨",
     layout="wide"
 )
 
 
 # ============================================================
-# ESTILOS: VERDE + AMARILLO PASTEL + AZUL ELÉCTRICO
+# DISEÑO VISUAL
 # ============================================================
 
 st.markdown("""
 <style>
 
-/* Fondo general */
+/* PALETA:
+   Verde menta: #70C69E
+   Amarillo:    #F8E7A2
+   Azul:        #176BFF
+   Azul oscuro: #244B78
+*/
+
+/* FONDO COMPLETO */
 .stApp {
     background: linear-gradient(
         135deg,
-        #F0FAF5 0%,
-        #FFF9E8 45%,
-        #EDF5FF 100%
+        #DDF4E9 0%,
+        #E9F5F8 35%,
+        #FFF3CE 70%,
+        #E3EEFF 100%
     );
+    background-attachment: fixed;
 }
 
-/* Contenedor */
-.block-container {
+/* Fondo del área principal */
+[data-testid="stAppViewContainer"] {
+    background: transparent;
+}
+
+[data-testid="stMain"] {
+    background: transparent;
+}
+
+[data-testid="stMainBlockContainer"] {
     padding-top: 2rem;
-    padding-bottom: 2rem;
-    max-width: 1400px;
+    padding-bottom: 3rem;
+    max-width: 1450px;
 }
 
-/* Título principal */
+/* BARRA LATERAL */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(
+        180deg,
+        #BFEBD5 0%,
+        #D9F0E6 40%,
+        #DDEAFF 100%
+    );
+    border-right: 2px solid #C4E6DA;
+}
+
+section[data-testid="stSidebar"] > div {
+    background: transparent;
+}
+
+/* TÍTULO */
 .titulo {
+    font-size: 4.5rem;
+    font-weight: 950;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin: 0;
     background: linear-gradient(
         100deg,
-        #49A981 0%,
-        #F0C94D 45%,
+        #258B65 0%,
+        #E0AC25 48%,
         #176BFF 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 4.2rem;
-    font-weight: 900;
-    letter-spacing: -2px;
-    line-height: 1.15;
-    margin-bottom: 0;
 }
 
-/* Subtítulo */
+/* SUBTÍTULO */
 .subtitulo {
-    color: #648B91;
     font-size: 1.15rem;
-    margin-top: 8px;
+    font-weight: 600;
+    color: #426B79 !important;
+    margin-top: 10px;
 }
 
-/* Tarjetas */
+/* TEXTO INTRODUCTORIO */
+.intro {
+    background: linear-gradient(
+        100deg,
+        #BDEBD3,
+        #D6EBFF,
+        #FFF0BB
+    );
+    border: 1px solid #C5E6D8;
+    border-radius: 18px;
+    padding: 17px 22px;
+    color: #315B68 !important;
+    font-weight: 600;
+    margin: 20px 0;
+}
+
+/* TARJETAS */
 .tarjeta {
     background: linear-gradient(
         145deg,
         #FFFFFF 0%,
-        #F0FAF5 45%,
-        #FFF9E8 100%
+        #E9F8EF 55%,
+        #FFF8E4 100%
     );
+    border: 2px solid #D5EBDD;
+    border-radius: 22px;
     padding: 22px;
-    border-radius: 20px;
-    border: 1px solid #E4EEDC;
-    box-shadow: 0 5px 18px rgba(91, 151, 143, 0.09);
-    margin-bottom: 16px;
-    color: #496D70;
+    margin-bottom: 17px;
+    box-shadow: 0 6px 18px rgba(56, 119, 103, 0.10);
+    color: #345E67;
 }
 
 .tarjeta h4 {
-    color: #398B72;
+    color: #278464 !important;
+    font-weight: 800;
 }
 
-/* Texto secundario */
-.pequeno {
-    color: #789A9D;
-    font-size: 0.9rem;
+.tarjeta p {
+    color: #426A73 !important;
 }
 
-/* Botones */
-div.stButton > button {
+/* TARJETA AZUL */
+.tarjeta-azul {
     background: linear-gradient(
-        100deg,
-        #70C69E,
-        #347CFF
+        145deg,
+        #DCEAFF,
+        #C9E4FA
     );
-    color: white;
-    border: none;
-    border-radius: 13px;
-    font-weight: 700;
-    min-height: 47px;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(52, 124, 255, 0.16);
+    border: 2px solid #BDD7F5;
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 17px;
+    color: #244B78;
+}
+
+.tarjeta-azul h4,
+.tarjeta-azul p {
+    color: #244B78 !important;
+}
+
+/* TARJETA AMARILLA */
+.tarjeta-amarilla {
+    background: linear-gradient(
+        145deg,
+        #FFF5D0,
+        #FFEAA9
+    );
+    border: 2px solid #F1D989;
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 17px;
+    color: #755D25;
+}
+
+.tarjeta-amarilla h4,
+.tarjeta-amarilla p {
+    color: #755D25 !important;
+}
+
+/* BOTONES GENERALES */
+div.stButton > button {
+    background: #176BFF !important;
+    color: #FFFFFF !important;
+    border: 2px solid #176BFF !important;
+    border-radius: 14px !important;
+    min-height: 48px;
+    font-size: 0.96rem;
+    font-weight: 750;
+    box-shadow: 0 5px 12px rgba(23, 107, 255, 0.18);
+    transition: all 0.2s ease;
+}
+
+/* Texto interno de botones */
+div.stButton > button p,
+div.stButton > button span {
+    color: #FFFFFF !important;
 }
 
 /* Hover */
 div.stButton > button:hover {
-    background: linear-gradient(
-        100deg,
-        #55B88A,
-        #145FEA
-    );
-    color: white;
-    border: none;
+    background: #0755DB !important;
+    border-color: #0755DB !important;
+    color: #FFFFFF !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(52, 124, 255, 0.25);
+    box-shadow: 0 7px 16px rgba(23, 107, 255, 0.25);
 }
 
 /* Botón principal */
 div.stButton > button[kind="primary"] {
     background: linear-gradient(
         100deg,
-        #F0C94D,
+        #258B65,
         #176BFF
-    );
-    color: white;
+    ) !important;
+    border: none !important;
+    color: white !important;
 }
 
-/* Barra lateral */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(
-        180deg,
-        #E3F4EA 0%,
-        #FFF5D9 50%,
-        #E5EFFF 100%
-    );
-    border-right: 1px solid #DCE9E8;
+/* BOTONES DE LA BARRA LATERAL */
+section[data-testid="stSidebar"] div.stButton > button {
+    background: #258B65 !important;
+    border-color: #258B65 !important;
 }
 
-/* Encabezados */
-h1, h2, h3 {
-    color: #477F7D;
-}
-
-/* Texto general */
-p, label {
-    color: #587B7D;
-}
-
-/* Selectores */
+/* SELECTORES */
 div[data-baseweb="select"] > div {
-    background-color: #FFFFFF;
-    border-radius: 11px;
-    border-color: #D5EAE3;
+    background: #FFFFFF !important;
+    border: 2px solid #B8DCCB !important;
+    border-radius: 12px !important;
 }
 
-/* Campos de texto */
+/* INPUTS */
 div[data-baseweb="input"] {
-    background-color: #FFFFFF;
-    border-radius: 11px;
+    background: #FFFFFF !important;
+    border: 2px solid #B8DCCB !important;
+    border-radius: 12px !important;
 }
 
-/* Alertas */
+div[data-baseweb="input"] input {
+    color: #315B68 !important;
+}
+
+/* TEXTAREA */
+div[data-baseweb="textarea"] {
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+}
+
+/* RADIO BUTTONS */
+div[role="radiogroup"] label {
+    background: rgba(255,255,255,0.65);
+    border-radius: 10px;
+    padding: 7px 10px;
+}
+
+/* SLIDER */
+div[data-testid="stSlider"] [role="slider"] {
+    background: #176BFF !important;
+}
+
+/* CHECKBOX */
+div[data-testid="stCheckbox"] {
+    color: #315B68;
+}
+
+/* ALERTAS */
 div[data-testid="stAlert"] {
     background: linear-gradient(
         100deg,
-        #FFF7D9,
-        #E8F1FF
+        #E4F5E9,
+        #E2EDFF
     );
-    border: 1px solid #E8E2BB;
-    border-radius: 14px;
-}
-
-/* Separadores */
-hr {
-    border-color: #DCE9E2;
-}
-
-/* Canvas */
-canvas {
+    border: 2px solid #C9E5D7;
     border-radius: 15px;
+}
+
+/* MENSAJES DE ÉXITO */
+div[data-testid="stAlert"][data-type="success"] {
+    background: #DDF5E5;
+}
+
+/* ENCABEZADOS */
+h1, h2, h3 {
+    color: #285E73 !important;
+    font-weight: 850;
+}
+
+h4 {
+    color: #398B72 !important;
+}
+
+/* TEXTO */
+p, label, li {
+    color: #426B73;
+}
+
+/* SEPARADORES */
+hr {
+    border-color: #BFDCCF;
+}
+
+/* LIENZO */
+canvas {
+    border-radius: 18px !important;
+    border: 3px solid #FFFFFF !important;
+    box-shadow: 0 5px 18px rgba(51, 105, 106, 0.12);
+}
+
+/* IMÁGENES */
+[data-testid="stImage"] img {
+    border-radius: 16px;
+}
+
+/* PIE DE PÁGINA */
+.footer {
+    text-align: center;
+    color: #567B83;
+    font-size: 0.9rem;
+    padding: 18px;
+}
+
+/* TABS */
+button[data-baseweb="tab"] {
+    color: #315B68 !important;
+    font-weight: 700;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #176BFF !important;
+}
+
+/* OCULTAR ESPACIO SUPERIOR EXCESIVO */
+header[data-testid="stHeader"] {
+    background: transparent;
 }
 
 </style>
@@ -217,9 +366,7 @@ if "story" not in st.session_state:
 # ============================================================
 
 def image_to_base64(image):
-
     buffer = BytesIO()
-
     image.save(buffer, format="PNG")
 
     return base64.b64encode(
@@ -243,38 +390,35 @@ def analyze_drawing(client, image_base64, age_group, objective):
 
     ### 1. ¿Qué observamos en el dibujo?
     Describe los elementos que parecen aparecer.
-    Si no estás seguro, menciona las posibles interpretaciones.
+    Si no estás seguro, menciona posibles interpretaciones.
 
     ### 2. Palabras para trabajar
     Propón entre 4 y 6 palabras relacionadas con el dibujo.
-    Incluye sustantivos, características y acciones cuando corresponda.
+    Incluye sustantivos, características y acciones.
 
     ### 3. Preguntas para conversar
-    Propón 4 preguntas abiertas y sencillas que el terapeuta
-    pueda hacerle al niño.
+    Propón 4 preguntas abiertas y sencillas para el niño.
 
     ### 4. Actividad de lenguaje
-    Crea una actividad breve relacionada con este objetivo:
+    Crea una actividad breve relacionada con:
     {objective}
 
     Explica cómo realizarla en pocos pasos.
 
     ### 5. Construcción de frases
     Propón 2 frases cortas que el niño podría construir
-    utilizando los elementos del dibujo.
+    con los elementos del dibujo.
 
     ### 6. Idea para continuar
-    Sugiere un pequeño reto o pregunta para ampliar el dibujo
-    y continuar la conversación.
+    Sugiere un reto o pregunta para ampliar el dibujo.
 
-    REGLAS IMPORTANTES:
-    - Adapta la complejidad al grupo de edad.
+    REGLAS:
+    - Adapta la complejidad a la edad indicada.
     - Mantén un tono positivo y cercano.
-    - No inventes detalles que no puedas observar.
-    - No evalúes la inteligencia ni el desarrollo del niño.
+    - No inventes detalles.
     - No realices diagnósticos.
-    - No afirmes que el niño tiene dificultades del lenguaje.
-    - No evalúes pronunciación o expresión oral a partir del dibujo.
+    - No evalúes la inteligencia ni el desarrollo del niño.
+    - No evalúes pronunciación a partir del dibujo.
     - Las sugerencias deben ser revisadas por el terapeuta.
     """
 
@@ -355,11 +499,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.write("")
-
-st.info(
-    "HablaTrazo transforma los dibujos infantiles en oportunidades "
-    "para conversar, aprender palabras y crear historias."
+st.markdown(
+    """
+    <div class="intro">
+        🌈 ¡Bienvenido a HablaTrazo! Aquí cada dibujo se convierte
+        en una oportunidad para imaginar, aprender nuevas palabras
+        y crear historias.
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 
@@ -369,7 +517,9 @@ st.info(
 
 with st.sidebar:
 
-    st.header("⚙️ Configuración")
+    st.markdown("## 🌟 HablaTrazo")
+
+    st.markdown("### ⚙️ Configuración")
 
     st.markdown("### 🎯 Objetivo de la actividad")
 
@@ -420,27 +570,26 @@ with st.sidebar:
             [
                 "#222222",
                 "#E74C3C",
-                "#3498DB",
-                "#2ECC71",
+                "#176BFF",
+                "#258B65",
                 "#9B59B6",
-                "#F39C12",
+                "#F0C94D",
                 "#FF69B4",
                 "#795548"
             ],
             format_func=lambda color: {
                 "#222222": "Negro",
                 "#E74C3C": "Rojo",
-                "#3498DB": "Azul",
-                "#2ECC71": "Verde",
+                "#176BFF": "Azul eléctrico",
+                "#258B65": "Verde",
                 "#9B59B6": "Morado",
-                "#F39C12": "Naranja",
+                "#F0C94D": "Amarillo",
                 "#FF69B4": "Rosado",
                 "#795548": "Marrón"
             }[color]
         )
 
     else:
-
         stroke_color = "#FFFFFF"
 
     stroke_width = st.slider(
@@ -461,18 +610,24 @@ with st.sidebar:
     )
 
     st.caption(
-        "La clave se utiliza para realizar el análisis "
-        "con el modelo de inteligencia artificial."
+        "La clave se utiliza para analizar los dibujos "
+        "con inteligencia artificial."
     )
 
     st.divider()
 
-    st.markdown("### 💡 Acerca de HablaTrazo")
-
-    st.write(
-        "Una herramienta de apoyo para que los terapeutas "
-        "aprovechen los dibujos infantiles como punto de partida "
-        "para actividades de lenguaje."
+    st.markdown(
+        """
+        <div class="tarjeta-amarilla">
+            <h4>💡 Sobre HablaTrazo</h4>
+            <p>
+                Una herramienta de apoyo para aprovechar los dibujos
+                infantiles como punto de partida para actividades
+                de lenguaje.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
 
@@ -505,31 +660,37 @@ with canvas_col:
 
 with info_col:
 
-    st.markdown("""
-    <div class="tarjeta">
-        <h4>🌈 ¿Qué puedes dibujar?</h4>
-        <p>🐶 Animales</p>
-        <p>🏠 Lugares</p>
-        <p>🍎 Alimentos</p>
-        <p>👨‍👩‍👧 Personas</p>
-        <p>🚗 Objetos</p>
-        <p>🌳 Naturaleza</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="tarjeta">
+            <h4>🌈 ¿Qué puedes dibujar?</h4>
+            <p>🐶 Animales</p>
+            <p>🏠 Lugares</p>
+            <p>🍎 Alimentos</p>
+            <p>👨‍👩‍👧 Personas</p>
+            <p>🚗 Objetos</p>
+            <p>🌳 Naturaleza</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown("""
-    <div class="tarjeta">
-        <h4>💡 ¿Cómo funciona?</h4>
-        <p>1. Realiza un dibujo.</p>
-        <p>2. Presiona analizar.</p>
-        <p>3. Descubre qué interpreta la IA.</p>
-        <p>4. Utiliza las actividades para conversar.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="tarjeta-amarilla">
+            <h4>💡 ¿Cómo funciona?</h4>
+            <p>1. Realiza un dibujo.</p>
+            <p>2. Presiona analizar.</p>
+            <p>3. Descubre qué interpreta la IA.</p>
+            <p>4. Utiliza las actividades para conversar.</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # ============================================================
-# BOTONES DEL TABLERO
+# BOTONES
 # ============================================================
 
 button_col1, button_col2 = st.columns(2)
@@ -653,7 +814,7 @@ if st.session_state.analysis_done:
 
     with result_col1:
 
-        st.markdown("### Tu dibujo")
+        st.markdown("### 🎨 Tu dibujo")
 
         st.image(
             st.session_state.drawing_bytes,
@@ -662,7 +823,7 @@ if st.session_state.analysis_done:
 
     with result_col2:
 
-        st.markdown("### Lo que interpreta HablaTrazo")
+        st.markdown("### 💬 Lo que interpreta HablaTrazo")
 
         st.markdown(
             st.session_state.full_response
@@ -670,7 +831,7 @@ if st.session_state.analysis_done:
 
 
     # ========================================================
-    # CREAR HISTORIA
+    # HISTORIA INFANTIL
     # ========================================================
 
     st.divider()
@@ -686,7 +847,7 @@ if st.session_state.analysis_done:
 
         try:
 
-            with st.spinner("Inventando una historia..."):
+            with st.spinner("🌟 Inventando una historia..."):
 
                 client = OpenAI(api_key=api_key)
 
@@ -710,16 +871,16 @@ if st.session_state.analysis_done:
 
     if st.session_state.story:
 
-        st.markdown("### 📖 Nuestra historia")
-
         st.markdown(
-            f"""
-            <div class="tarjeta">
-                {st.session_state.story}
+            """
+            <div class="tarjeta-amarilla">
+                <h4>📖 Nuestra historia</h4>
             </div>
             """,
             unsafe_allow_html=True
         )
+
+        st.markdown(st.session_state.story)
 
 
 # ============================================================
@@ -730,16 +891,14 @@ st.divider()
 
 st.markdown(
     """
-    <p style="
-        text-align:center;
-        color:#789A9D;
-        font-size:0.85rem;
-    ">
-        HablaTrazo · Dibuja, descubre y conversa 🎨
+    <div class="footer">
+        🎨 <b>HablaTrazo</b> · Dibuja, descubre y conversa.
+        <br><br>
+        Una herramienta de apoyo. Las sugerencias deben ser
+        revisadas y adaptadas por el terapeuta.
         <br>
-        Herramienta de apoyo. Las sugerencias deben ser revisadas
-        y adaptadas por el terapeuta.
-    </p>
+        💚 💛 💙
+    </div>
     """,
     unsafe_allow_html=True
 )
