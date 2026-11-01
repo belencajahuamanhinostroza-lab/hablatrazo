@@ -24,7 +24,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Fondo general */
+/* FONDO GENERAL */
 html, body, [data-testid="stAppViewContainer"],
 [data-testid="stMain"], .stApp {
     background: linear-gradient(
@@ -46,7 +46,7 @@ html, body, [data-testid="stAppViewContainer"],
     padding-bottom: 3rem;
 }
 
-/* Encabezado principal */
+/* ENCABEZADO PRINCIPAL */
 .encabezado-app {
     width: 100%;
     padding: 25px 35px;
@@ -90,7 +90,7 @@ html, body, [data-testid="stAppViewContainer"],
     margin: 5px 0 0 0 !important;
 }
 
-/* Títulos */
+/* TÍTULOS */
 h2, h3 {
     color: #244B78 !important;
     font-weight: 800 !important;
@@ -100,7 +100,7 @@ p, label, li {
     color: #285E73;
 }
 
-/* Tarjetas */
+/* TARJETAS */
 .tarjeta {
     background: rgba(255, 255, 255, 0.75);
     border: 2px solid rgba(255,255,255,0.8);
@@ -122,39 +122,61 @@ p, label, li {
     background: #DCEAFF;
 }
 
-/* Botones */
+/* TODOS LOS BOTONES: LETRAS BLANCAS */
+.stButton > button,
+.stButton > button p,
+.stButton > button span,
+.stButton > button div,
+.stDownloadButton > button,
+.stDownloadButton > button p,
+.stDownloadButton > button span,
+.stDownloadButton > button div {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+/* BOTONES PRINCIPALES */
 .stButton > button {
     background: #176BFF !important;
-    color: white !important;
     border: none !important;
     border-radius: 13px !important;
     padding: 12px 20px !important;
-    font-weight: 700 !important;
     transition: 0.2s;
 }
 
 .stButton > button:hover {
     background: #258B65 !important;
-    color: white !important;
+    color: #FFFFFF !important;
     transform: translateY(-2px);
 }
 
-/* Botones de descarga */
+/* BOTONES DE DESCARGA */
 .stDownloadButton > button {
     background: #258B65 !important;
-    color: white !important;
     border: none !important;
     border-radius: 13px !important;
-    font-weight: 700 !important;
+    padding: 12px 20px !important;
 }
 
-/* Campos */
+.stDownloadButton > button:hover {
+    background: #176BFF !important;
+    color: #FFFFFF !important;
+}
+
+/* ESTADO DESACTIVADO */
+.stButton > button:disabled,
+.stDownloadButton > button:disabled {
+    color: #FFFFFF !important;
+    opacity: 0.65;
+}
+
+/* CAMPOS */
 .stTextInput input,
 .stSelectbox div[data-baseweb="select"] {
     border-radius: 12px !important;
 }
 
-/* Sidebar */
+/* BARRA LATERAL */
 [data-testid="stSidebar"] {
     background: linear-gradient(
         180deg,
@@ -163,12 +185,12 @@ p, label, li {
     ) !important;
 }
 
-/* Separadores */
+/* SEPARADORES */
 hr {
     border-color: rgba(36,75,120,0.15);
 }
 
-/* Pie de página */
+/* PIE DE PÁGINA */
 .pie {
     text-align: center;
     color: #527B8C;
@@ -392,7 +414,9 @@ with st.sidebar:
         placeholder="Introduce tu API Key"
     )
 
-    st.caption("La clave se utiliza para realizar el análisis del dibujo.")
+    st.caption(
+        "La clave se utiliza para realizar el análisis del dibujo."
+    )
 
 
 # --------------------------------------------------
@@ -437,16 +461,21 @@ with col_lienzo:
     col_limpiar, col_guardar = st.columns(2)
 
     with col_limpiar:
+
         if st.button("🗑️ Limpiar hoja", use_container_width=True):
+
             st.session_state.canvas_key += 1
             st.session_state.analysis_done = False
             st.session_state.full_response = ""
             st.session_state.drawing_bytes = None
             st.session_state.story = ""
+
             st.rerun()
 
     with col_guardar:
+
         if canvas_result.image_data is not None:
+
             image_to_save = Image.fromarray(
                 canvas_result.image_data.astype("uint8")
             )
@@ -501,32 +530,46 @@ with col_info:
 # --------------------------------------------------
 
 st.markdown("---")
-st.markdown("### 🤖 Descubramos qué podemos trabajar con este dibujo")
+
+st.markdown(
+    "### 🤖 Descubramos qué podemos trabajar con este dibujo"
+)
 
 if st.button("✨ Analizar mi dibujo", use_container_width=True):
 
     if not api_key:
-        st.warning("Primero debes introducir tu clave API de OpenAI.")
+        st.warning(
+            "Primero debes introducir tu clave API de OpenAI."
+        )
 
     elif canvas_result.image_data is None:
-        st.warning("Primero realiza un dibujo en el lienzo.")
+        st.warning(
+            "Primero realiza un dibujo en el lienzo."
+        )
 
     else:
+
         image_array = canvas_result.image_data.astype("uint8")
         image = Image.fromarray(image_array).convert("RGB")
 
-        # Comprobar si el lienzo está vacío
         pixels = np.array(image)
         is_blank = np.all(pixels > 245)
 
         if is_blank:
-            st.warning("El lienzo está vacío. ¡Haz un dibujo primero!")
+
+            st.warning(
+                "El lienzo está vacío. ¡Haz un dibujo primero!"
+            )
 
         else:
+
             try:
+
                 client = OpenAI(api_key=api_key)
 
-                with st.spinner("🎨 Estamos observando tu dibujo..."):
+                with st.spinner(
+                    "🎨 Estamos observando tu dibujo..."
+                ):
 
                     result = analyze_drawing(
                         image,
@@ -541,7 +584,10 @@ if st.button("✨ Analizar mi dibujo", use_container_width=True):
                     st.session_state.story = ""
 
             except Exception as e:
-                st.error(f"No se pudo realizar el análisis: {e}")
+
+                st.error(
+                    f"No se pudo realizar el análisis: {e}"
+                )
 
 
 # --------------------------------------------------
@@ -551,13 +597,17 @@ if st.button("✨ Analizar mi dibujo", use_container_width=True):
 if st.session_state.analysis_done:
 
     st.markdown("---")
-    st.markdown("## 🌟 ¡Descubramos lo que podemos aprender!")
+
+    st.markdown(
+        "## 🌟 ¡Descubramos lo que podemos aprender!"
+    )
 
     st.markdown(
         st.session_state.full_response
     )
 
     if st.session_state.drawing_bytes is not None:
+
         st.markdown("### 🖼️ Tu dibujo")
 
         st.image(
@@ -567,23 +617,29 @@ if st.session_state.analysis_done:
 
     st.markdown("---")
 
-    # --------------------------------------------------
     # CREAR HISTORIA
-    # --------------------------------------------------
 
-    st.markdown("### 📖 ¡Convirtamos el dibujo en una historia!")
+    st.markdown(
+        "### 📖 ¡Convirtamos el dibujo en una historia!"
+    )
 
     st.write(
         "Puedes transformar el dibujo en un pequeño cuento "
         "para estimular la imaginación y la narración."
     )
 
-    if st.button("📚 Crear una historia", use_container_width=True):
+    if st.button(
+        "📚 Crear una historia",
+        use_container_width=True
+    ):
 
         try:
+
             client = OpenAI(api_key=api_key)
 
-            with st.spinner("✨ Inventando una historia..."):
+            with st.spinner(
+                "✨ Inventando una historia..."
+            ):
 
                 story = create_story(
                     st.session_state.full_response,
@@ -594,16 +650,22 @@ if st.session_state.analysis_done:
                 st.session_state.story = story
 
         except Exception as e:
-            st.error(f"No se pudo crear la historia: {e}")
+
+            st.error(
+                f"No se pudo crear la historia: {e}"
+            )
 
     if st.session_state.story:
+
         st.markdown("""
         <div class="tarjeta tarjeta-amarilla">
             <h3>📖 Nuestra historia</h3>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(st.session_state.story)
+        st.markdown(
+            st.session_state.story
+        )
 
 
 # --------------------------------------------------
