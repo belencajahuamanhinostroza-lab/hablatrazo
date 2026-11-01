@@ -21,7 +21,7 @@ st.set_page_config(
 
 
 # ============================================================
-# ESTILOS VISUALES: VERDE Y AZUL PASTEL
+# ESTILOS: VERDE + AMARILLO PASTEL + AZUL ELÉCTRICO
 # ============================================================
 
 st.markdown("""
@@ -31,9 +31,9 @@ st.markdown("""
 .stApp {
     background: linear-gradient(
         135deg,
-        #F0FAF6 0%,
-        #EDF7FA 48%,
-        #E8F3FA 100%
+        #F0FAF5 0%,
+        #FFF9E8 45%,
+        #EDF5FF 100%
     );
 }
 
@@ -44,26 +44,28 @@ st.markdown("""
     max-width: 1400px;
 }
 
-/* Título */
+/* Título principal */
 .titulo {
     background: linear-gradient(
-        90deg,
-        #55A88B,
-        #579BC5,
-        #7BAED0
+        100deg,
+        #49A981 0%,
+        #F0C94D 45%,
+        #176BFF 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 2.8rem;
-    font-weight: 850;
+    font-size: 4.2rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.15;
     margin-bottom: 0;
 }
 
 /* Subtítulo */
 .subtitulo {
     color: #648B91;
-    font-size: 1.05rem;
-    margin-top: 5px;
+    font-size: 1.15rem;
+    margin-top: 8px;
 }
 
 /* Tarjetas */
@@ -71,20 +73,19 @@ st.markdown("""
     background: linear-gradient(
         145deg,
         #FFFFFF 0%,
-        #F0FAF7 55%,
-        #EEF7FC 100%
+        #F0FAF5 45%,
+        #FFF9E8 100%
     );
     padding: 22px;
     border-radius: 20px;
-    border: 1px solid #DCEFE9;
-    box-shadow: 0 5px 18px rgba(91, 151, 143, 0.08);
+    border: 1px solid #E4EEDC;
+    box-shadow: 0 5px 18px rgba(91, 151, 143, 0.09);
     margin-bottom: 16px;
     color: #496D70;
 }
 
-/* Títulos de tarjetas */
 .tarjeta h4 {
-    color: #4C927F;
+    color: #398B72;
 }
 
 /* Texto secundario */
@@ -97,38 +98,50 @@ st.markdown("""
 div.stButton > button {
     background: linear-gradient(
         100deg,
-        #78C5A6,
-        #72B6D0
+        #70C69E,
+        #347CFF
     );
     color: white;
     border: none;
     border-radius: 13px;
-    font-weight: 650;
-    min-height: 45px;
+    font-weight: 700;
+    min-height: 47px;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(94, 166, 157, 0.18);
+    box-shadow: 0 4px 12px rgba(52, 124, 255, 0.16);
 }
 
-/* Efecto hover */
+/* Hover */
 div.stButton > button:hover {
     background: linear-gradient(
         100deg,
-        #60B493,
-        #5A9FC0
+        #55B88A,
+        #145FEA
     );
     color: white;
     border: none;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 124, 255, 0.25);
+}
+
+/* Botón principal */
+div.stButton > button[kind="primary"] {
+    background: linear-gradient(
+        100deg,
+        #F0C94D,
+        #176BFF
+    );
+    color: white;
 }
 
 /* Barra lateral */
 section[data-testid="stSidebar"] {
     background: linear-gradient(
         180deg,
-        #E3F4EC 0%,
-        #E5F1F8 100%
+        #E3F4EA 0%,
+        #FFF5D9 50%,
+        #E5EFFF 100%
     );
-    border-right: 1px solid #D7EAE5;
+    border-right: 1px solid #DCE9E8;
 }
 
 /* Encabezados */
@@ -158,16 +171,16 @@ div[data-baseweb="input"] {
 div[data-testid="stAlert"] {
     background: linear-gradient(
         100deg,
-        #E4F5EC,
-        #E5F2FA
+        #FFF7D9,
+        #E8F1FF
     );
-    border: 1px solid #CDE8DF;
+    border: 1px solid #E8E2BB;
     border-radius: 14px;
 }
 
 /* Separadores */
 hr {
-    border-color: #D5EAE4;
+    border-color: #DCE9E2;
 }
 
 /* Canvas */
@@ -204,8 +217,9 @@ if "story" not in st.session_state:
 # ============================================================
 
 def image_to_base64(image):
-    """Convierte una imagen PIL a Base64."""
+
     buffer = BytesIO()
+
     image.save(buffer, format="PNG")
 
     return base64.b64encode(
@@ -334,8 +348,10 @@ st.markdown(
 )
 
 st.markdown(
-    '<p class="subtitulo">Dibuja, descubre y conversa. '
-    'Un espacio creativo para estimular el lenguaje infantil.</p>',
+    '<p class="subtitulo">'
+    'Dibuja, descubre y conversa. '
+    'Un espacio creativo para estimular el lenguaje infantil.'
+    '</p>',
     unsafe_allow_html=True
 )
 
@@ -424,6 +440,7 @@ with st.sidebar:
         )
 
     else:
+
         stroke_color = "#FFFFFF"
 
     stroke_width = st.slider(
